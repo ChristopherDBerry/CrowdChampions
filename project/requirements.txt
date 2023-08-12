@@ -1,5 +1,7 @@
+psycopg2>=2.8.6,<2.9
+mysqlclient==2.1.0
 Django==3.2.4
-celery==5.1.2
+celery>5.2.3,<6.0
 redis==3.5.3
 django-celery-beat==2.5.0
 djangorestframework>=3.12.4,<3.13
