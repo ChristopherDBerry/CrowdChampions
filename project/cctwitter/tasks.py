@@ -1,21 +1,60 @@
 from celery import shared_task
 from celery.utils.log import get_task_logger
-from django.core.management import call_command
+from django.utils import timezone
 from .models import ManagedTweet
 from django_celery_beat.models import PeriodicTask
 
 logger = get_task_logger(__name__)
 
 
+def disable_managed_tweet(tweet, err=None):
+    tweet.enabled = False
+    tweet.save()
+    if err:
+        logger.error(f'{tweet.name}')
+        logger.error(f'{err}')
+
+
 @shared_task
 def send_tweets(periodic_task_id):
     task = PeriodicTask.objects.get(id=periodic_task_id)
+    tweets = ManagedTweet.objects.filter(enabled=True)
     if task.interval:
-        tweets = ManagedTweet.objects.filter(interval_schedule=task.interval)
+        tweets = tweets.filter(interval_schedule=task.interval)
         schedule = task.interval
     elif task.crontab:
-        tweets = ManagedTweet.objects.filter(crontab_schedule=task.crontab)
+        tweets = tweets.filter(crontab_schedule=task.crontab)
         schedule = task.crontab
-    #TODO: implement for clocked, solar
+    # TODO: implement for clocked, solar
     for tweet in tweets:
-        logger.info(f'{tweet.body} : {schedule}')
+        if (tweet.expiry_times_sent and
+            tweet.times_sent > tweet.expiry_times_sent): # noqa
+            disable_managed_tweet(tweet)
+            continue
+        if (tweet.expiry_date and
+            tweet.expiry_date > timezone.now()): # noqa
+            disable_managed_tweet(tweet)
+            continue
+        if tweet.body_template:
+            data_lines = tweet.body_template_data
+            if len(data_lines) == 1:
+                data = data_lines[0]
+            else:
+                try:
+                    data = data_lines[tweet.times_sent]
+                except IndexError:
+                    disable_managed_tweet(
+                        tweet, f'IndexError: {tweet.times_sent}')
+                    continue
+            try:
+                body = f"{tweet.body_template.body}".format(**data)
+            except KeyError as e:
+                disable_managed_tweet(
+                    tweet, f'KeyError: {e}')
+                continue
+        else:
+            body = tweet.body
+        # TODO: tweet, or log if debug
+        logger.info(f'{body} : {schedule}')
+        tweet.times_sent += 1
+        tweet.save()
