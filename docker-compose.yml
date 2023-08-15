@@ -69,6 +69,13 @@ services:
     build:
       context: ./frontend
       dockerfile: Dockerfile.node
+    environment:
+      CHOKIDAR_USEPOLLING: 'true'
+      FAST_REFRESH: 'false'
+    command: nodemon --exec npm run start
+    volumes:
+      - ./frontend/src/:/app/src/
+      - ./frontend/public/:/app/public/
     ports:
       - '3000:3000'
 
