@@ -1,6 +1,17 @@
-from django.urls import path
+from django.urls import path, include
+from rest_framework import routers
+
+from . import views
+
+router = routers.DefaultRouter()
+router.register(r"clients", views.ClientViewSet, basename="client")
 
 app_name = "cctwitter"
 
 urlpatterns = [
+    path('', include(router.urls)),
+    path('get-client-url/<int:client_id>/',
+        views.GenerateClientUrl.as_view()),
+    path('set-client-token/<int:client_id>/<str:pin>/',
+        views.GenerateClientToken.as_view()),
 ]

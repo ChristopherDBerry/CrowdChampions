@@ -39,7 +39,9 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
     "orders.apps.OrdersConfig",
-    'django_celery_beat',
+    "rest_framework",
+    "drf_spectacular",
+    "django_celery_beat",
     "cctwitter",
 ]
 
@@ -145,3 +147,15 @@ CELERY_BEAT_SCHEDULE = {
 EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
 DEFAULT_FROM_EMAIL = "noreply@email.com"
 ADMINS = [("testuser", "test.user@email.com"), ]
+
+#XXX DO NOT COMMIT!
+#Prompt developer to enter App credentials
+TWITTER_CONSUMER_KEY = ''
+TWITTER_CONSUMER_SECRET = ''
+TWITTER_ACCESS_TOKEN = ''
+TWITTER_TOKEN_SECRET = ''
+
+
+REST_FRAMEWORK = {
+    'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
+}

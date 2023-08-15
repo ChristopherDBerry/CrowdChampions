@@ -73,3 +73,12 @@ class TweetTemplate(models.Model):
     def __str__(self):
         return self.name
 
+
+class Client(models.Model):
+    owner = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
+    username = models.CharField(max_length=100)
+    authorization_url = models.CharField(max_length=200, blank=True, null=True)
+    oauth_token = models.CharField(max_length=100, blank=True, null=True)
+    oauth_token_secret = models.CharField(max_length=100, blank=True, null=True)
+    access_key = models.CharField(max_length=100, blank=True, null=True)
+    access_key_secret = models.CharField(max_length=100, blank=True, null=True)

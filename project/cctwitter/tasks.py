@@ -1,18 +1,13 @@
 from celery import shared_task
 from celery.utils.log import get_task_logger
 from django.utils import timezone
-from .models import ManagedTweet
+
 from django_celery_beat.models import PeriodicTask
 
+from .models import ManagedTweet
+from .utils import disable_managed_tweet, send_tweet
+
 logger = get_task_logger(__name__)
-
-
-def disable_managed_tweet(tweet, err=None):
-    tweet.enabled = False
-    tweet.save()
-    if err:
-        logger.error(f'{tweet.name}')
-        logger.error(f'{err}')
 
 
 @shared_task
@@ -21,10 +16,8 @@ def send_tweets(periodic_task_id):
     tweets = ManagedTweet.objects.filter(enabled=True)
     if task.interval:
         tweets = tweets.filter(interval_schedule=task.interval)
-        schedule = task.interval
     elif task.crontab:
         tweets = tweets.filter(crontab_schedule=task.crontab)
-        schedule = task.crontab
     # TODO: implement for clocked, solar
     for tweet in tweets:
         if (tweet.expiry_times_sent and
@@ -55,6 +48,4 @@ def send_tweets(periodic_task_id):
         else:
             body = tweet.body
         # TODO: tweet, or log if debug
-        logger.info(f'{body} : {schedule}')
-        tweet.times_sent += 1
-        tweet.save()
+        send_tweet(tweet, body)
