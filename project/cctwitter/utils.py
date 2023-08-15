@@ -17,6 +17,6 @@ def send_tweet(tweet, body, logger=logger):
         logger.info(body)
     else:  # TODO: send for real
         logger.info(body)
-    TODO: add logging
+    #TODO: add logging
     tweet.times_sent += 1
     tweet.save()
