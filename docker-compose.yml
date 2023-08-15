@@ -2,7 +2,9 @@ version: '3.8'
 
 services:
   web:
-    build: ./project
+    build:
+      context: ./project
+      dockerfile: Dockerfile.python
     command: >
         sh -c "python manage.py collectstatic --no-input --clear &&
                python manage.py runserver 0.0.0.0:8000"
@@ -26,7 +28,9 @@ services:
     image: redis:alpine
 
   celery:
-    build: ./project
+    build:
+      context: ./project
+      dockerfile: Dockerfile.python
     command: celery -A core worker -l info
     volumes:
       - ./project/:/usr/src/app/
@@ -44,7 +48,9 @@ services:
       - db
 
   celery-beat:
-    build: ./project
+    build:
+      context: ./project
+      dockerfile: Dockerfile.python
     command: celery -A core beat --loglevel=debug --scheduler django_celery_beat.schedulers:DatabaseScheduler
     volumes:
       - ./project/:/usr/src/app/
@@ -58,6 +64,13 @@ services:
       - DJANGO_ALLOWED_HOSTS=*
     depends_on:
       - redis
+
+  react:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile.node
+    ports:
+      - '3000:3000'
 
   db:
     image: postgres:13-alpine
