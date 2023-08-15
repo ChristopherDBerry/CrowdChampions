@@ -3,10 +3,16 @@ import axios from 'axios';
 
 function App() {
   const [data, setData] = useState([]);
+  const token = ''; // Replace with the actual token
 
   useEffect(() => {
-    // Fetch JSON resource
-    axios.get('http://localhost:8000/api/twitter/clients/')
+    const config = {
+      headers: {
+        Authorization: `Token ${token}`
+      }
+    };
+
+    axios.get('http://localhost:8000/api/twitter/clients/', config)
       .then(response => {
         setData(response.data);
       })
@@ -17,12 +23,9 @@ function App() {
 
   return (
     <div>
-      <h1>JSON Resource Example:</h1>
-      <ul>
-        {data.map(item => (
-          <li key={item.id}>{item.username}</li>
-        ))}
-      </ul>
+      {data.map(item => (
+        <div key={item.id}>{item.username}</div>
+      ))}
     </div>
   );
 }
