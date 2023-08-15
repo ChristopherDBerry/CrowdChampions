@@ -28,7 +28,6 @@ class GenerateClientUrl(APIView):
     permission_classes = [permissions.IsAuthenticated]
 
     def post(self, request, client_id):
-        #return Response(request.POST, status=200)
         oauth = OAuth1Session(
             settings.TWITTER_CONSUMER_KEY,
             client_secret=settings.TWITTER_CONSUMER_SECRET,

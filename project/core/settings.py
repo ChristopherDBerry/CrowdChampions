@@ -40,9 +40,12 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     "orders.apps.OrdersConfig", #XXX
     "rest_framework",
+    'rest_framework.authtoken',
     "corsheaders",
     "drf_spectacular",
     "django_celery_beat",
+
+    "ccauthentication",
     "cctwitter",
 ]
 
@@ -162,5 +165,9 @@ TWITTER_TOKEN_SECRET = ''
 
 
 REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework.authentication.TokenAuthentication',
+        'rest_framework.authentication.SessionAuthentication',
+    ],
     'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
 }
