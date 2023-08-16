@@ -10,8 +10,11 @@ app_name = "cctwitter"
 
 urlpatterns = [
     path('', include(router.urls)),
+    path('get-client-tweets/<int:client_id>/',
+          views.GetClientTweets.as_view()),
+    path('get-user-clients/', views.GetUserClients.as_view()),
     path('get-client-url/<int:client_id>/',
         views.GenerateClientUrl.as_view()),
-    path('set-client-token/<int:client_id>/<str:pin>/',
+    path('set-client-token/',
         views.GenerateClientToken.as_view()),
 ]

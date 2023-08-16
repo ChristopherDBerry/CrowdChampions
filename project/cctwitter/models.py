@@ -4,6 +4,19 @@ from django_celery_beat.models import (IntervalSchedule,
                                        CrontabSchedule)
 
 
+class Client(models.Model):
+    owner = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
+    username = models.CharField(max_length=100)
+    authorization_url = models.CharField(max_length=200, blank=True, null=True)
+    oauth_token = models.CharField(max_length=100, blank=True, null=True)
+    oauth_token_secret = models.CharField(max_length=100, blank=True, null=True)
+    access_key = models.CharField(max_length=100, blank=True, null=True)
+    access_key_secret = models.CharField(max_length=100, blank=True, null=True)
+
+    def __str__(self):
+        return self.username
+
+
 class ManagedTweet(models.Model):
     """ A managed tweet with a schedule """
 
@@ -14,18 +27,12 @@ class ManagedTweet(models.Model):
 
     enabled = models.BooleanField(default=True)
     name = models.CharField(max_length=100,)
-    owner = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
+    owner = models.ForeignKey(Client, on_delete=models.SET_NULL, null=True)
     body = models.TextField(
         null=True,
         blank=True,
         max_length=4000,
-        help_text='Body will be overriden by template if one is selected')
-    body_template = models.ForeignKey(
-        'TweetTemplate',
-        on_delete=models.SET_NULL,
-        null=True,
-        blank=True,
-    )
+        help_text="To display a variable use curly braces, eg {arg1}")
     body_template_data = models.JSONField(
         default=list,
         blank=True,
@@ -62,23 +69,5 @@ class ManagedTweet(models.Model):
         null=True,
     )
 
-
-class TweetTemplate(models.Model):
-    """ A simple template for a tweet """
-    name = models.CharField(max_length=100)
-    body = models.TextField(
-        max_length=4000,
-        help_text="To display a variable use curly braces, eg {arg1}")
-
     def __str__(self):
         return self.name
-
-
-class Client(models.Model):
-    owner = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
-    username = models.CharField(max_length=100)
-    authorization_url = models.CharField(max_length=200, blank=True, null=True)
-    oauth_token = models.CharField(max_length=100, blank=True, null=True)
-    oauth_token_secret = models.CharField(max_length=100, blank=True, null=True)
-    access_key = models.CharField(max_length=100, blank=True, null=True)
-    access_key_secret = models.CharField(max_length=100, blank=True, null=True)

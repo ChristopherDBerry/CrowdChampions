@@ -28,24 +28,21 @@ def send_tweets(periodic_task_id):
             tweet.expiry_date > timezone.now()): # noqa
             disable_managed_tweet(tweet)
             continue
-        if tweet.body_template:
-            data_lines = tweet.body_template_data
-            if len(data_lines) == 1:
-                data = data_lines[0]
-            else:
-                try:
-                    data = data_lines[tweet.times_sent]
-                except IndexError:
-                    disable_managed_tweet(
-                        tweet, f'IndexError: {tweet.times_sent}')
-                    continue
-            try:
-                body = f"{tweet.body_template.body}".format(**data)
-            except KeyError as e:
-                disable_managed_tweet(
-                    tweet, f'KeyError: {e}')
-                continue
+        data_lines = tweet.body_template_data
+        if len(data_lines) == 1:
+            data = data_lines[0]
         else:
-            body = tweet.body
+            try:
+                data = data_lines[tweet.times_sent]
+            except IndexError:
+                disable_managed_tweet(
+                    tweet, f'IndexError: {tweet.times_sent}')
+                continue
+        try:
+            body = f"{tweet.body}".format(**data)
+        except KeyError as e:
+            disable_managed_tweet(
+                tweet, f'KeyError: {e}')
+            continue
         # TODO: tweet, or log if debug
         send_tweet(tweet, body)

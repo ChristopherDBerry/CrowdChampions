@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from .models import ManagedTweet, TweetTemplate, Client
+from .models import ManagedTweet, Client
 
 # Custom admin for django_celery_beat
 from django_celery_beat.admin import (PeriodicTask,
@@ -31,7 +31,6 @@ class ManagedTweetAdmin(admin.ModelAdmin):
                 'name',
                 'owner',
                 'body',
-                'body_template',
                 'body_template_data',
                 'times_sent'),
         }),
@@ -45,5 +44,4 @@ class ManagedTweetAdmin(admin.ModelAdmin):
     )
 
 admin.site.register(ManagedTweet, ManagedTweetAdmin)
-admin.site.register(TweetTemplate)
 admin.site.register(Client)

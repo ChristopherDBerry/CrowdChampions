@@ -1,15 +1,15 @@
 import requests
 from requests_oauthlib import OAuth1Session
 
-from drf_spectacular.utils import extend_schema
 from django.conf import settings
-from rest_framework import viewsets
-from rest_framework import permissions
+from rest_framework import (viewsets,
+                            permissions,
+                            status)
 from rest_framework.views import APIView
 from rest_framework.response import Response
 
-from .models import Client
-from .serializers import ClientSerializer
+from .models import Client, ManagedTweet
+from .serializers import *
 
 
 class ClientViewSet(viewsets.ModelViewSet):
@@ -21,13 +21,46 @@ class ClientViewSet(viewsets.ModelViewSet):
     permission_classes = [permissions.IsAuthenticated]
 
 
+class GetUserClients(APIView):
+    """
+    API endpoint for twitter clients
+    """
+    permission_classes = [permissions.IsAuthenticated]
+    serializer_class = ClientSerializer
+
+    def get(self, request):
+        clients = Client.objects.filter(owner=request.user)
+        serializer = ClientSerializer(clients, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+class GetClientTweets(APIView):
+    """
+    API endpoint for client tweets
+    """
+    permission_classes = [permissions.IsAuthenticated]
+    serializer_class = GetClientTweetsSerializer
+
+    def get(self, request, client_id):
+        try:
+            client = Client.objects.get(id=client_id)
+        except Client.DoesNotExist:
+            return Response({"error": "Client not found."}, status=status.HTTP_404_NOT_FOUND)
+
+        managed_tweets = ManagedTweet.objects.filter(owner=client)
+
+        serializer = ManagedTweetSerializer(managed_tweets, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+
 class GenerateClientUrl(APIView):
     """
     API endpoint for twitter client tokens
     """
     permission_classes = [permissions.IsAuthenticated]
+    serializer_class = GenerateClientUrlSerializer
 
-    def post(self, request, client_id):
+    def get(self, request, client_id):
         oauth = OAuth1Session(
             settings.TWITTER_CONSUMER_KEY,
             client_secret=settings.TWITTER_CONSUMER_SECRET,
@@ -55,7 +88,7 @@ class GenerateClientUrl(APIView):
                 "resource_owner_oauth_token": resource_owner_oauth_token,
                 "resource_owner_oauth_token_secret":
                     resource_owner_oauth_token_secret}
-        return Response(data)
+        return Response(data, status=status.HTTP_200_OK)
 
 
 class GenerateClientToken(APIView):
@@ -63,16 +96,26 @@ class GenerateClientToken(APIView):
     API endpoint for twitter client tokens
     """
     permission_classes = [permissions.IsAuthenticated]
+    serializer_class = GenerateClientTokenSerializer
 
-    def post(self, request, client_id, pin):
-        client = Client.objects.get(id=client_id)
+    def post(self, request):
+        serializer = self.serializer_class
+        serializer.is_valid(raise_exception=True)
+
+        client_id = serializer.validated_data['client_id']
+        pin = serializer.validated_data['pin']
+
+        try:
+            client = Client.objects.get(id=client_id)
+        except Client.DoesNotExist:
+            return Response({"error": "Client not found."}, status=status.HTTP_404_NOT_FOUND)
 
         oauth = OAuth1Session(
-                        settings.TWITTER_CONSUMER_KEY,
-                        client_secret=settings.TWITTER_CONSUMER_SECRET,
-                        resource_owner_key=client.oauth_token,
-                        resource_owner_secret=client.oauth_token_secret,
-                        verifier=pin)
+            settings.TWITTER_CONSUMER_KEY,
+            client_secret=settings.TWITTER_CONSUMER_SECRET,
+            resource_owner_key=client.oauth_token,
+            resource_owner_secret=client.oauth_token_secret,
+            verifier=pin)
 
         url = "https://api.twitter.com/oauth/access_token"
 
@@ -83,7 +126,7 @@ class GenerateClientToken(APIView):
             user_id = response['user_id']
             screen_name = response['screen_name']
         except requests.exceptions.RequestException:
-            return Response({"error": "Something went wrong."}, status=500)
+            return Response({"error": "Something went wrong."}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
         client.access_key = access_key
         client.access_key_secret = access_key_secret
@@ -91,5 +134,4 @@ class GenerateClientToken(APIView):
 
         data = {'status': 'success', 'user_id': user_id, 'screen_name': screen_name}
 
-        return Response(data, status=200)
-
+        return Response(data, status=status.HTTP_200_OK)
