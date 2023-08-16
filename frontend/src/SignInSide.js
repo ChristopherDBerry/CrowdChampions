@@ -34,6 +34,7 @@ export default function SignInSide() {
       .then(response => {
         const token = response.data.token;
         setApiAuth({ username, token });
+        //TODO: replace with cookie, more appropriate
         localStorage.setItem('username', username);
         localStorage.setItem('token', token);
         history.push('/dashboard');
@@ -48,10 +49,8 @@ export default function SignInSide() {
     const data = new FormData(event.currentTarget);
     const username = data.get('username');
     const password = data.get('password');
-    generateToken(username, password)
+    generateToken(username, password);
   };
-
-  console.log(apiAuth)
 
   return (
     <ThemeProvider theme={defaultTheme}>
@@ -107,10 +106,6 @@ export default function SignInSide() {
                 type="password"
                 id="password"
                 autoComplete="current-password"
-              />
-              <FormControlLabel
-                control={<Checkbox value="remember" color="primary" />}
-                label="Remember me"
               />
               <Button
                 type="submit"
