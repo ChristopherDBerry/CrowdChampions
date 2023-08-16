@@ -1,5 +1,6 @@
 import * as React from 'react';
 import { useEffect } from 'react';
+import { useHistory } from 'react-router-dom';
 import axios from 'axios';
 
 import Avatar from '@mui/material/Avatar';
@@ -25,6 +26,7 @@ const defaultTheme = createTheme();
 
 export default function SignInSide() {
 
+  const history = useHistory();
   const { apiAuth, setApiAuth } = useApiAuthContext();
 
   function generateToken(username, password) {
@@ -34,17 +36,12 @@ export default function SignInSide() {
         setApiAuth({ username, token });
         localStorage.setItem('username', username);
         localStorage.setItem('token', token);
+        history.push('/main');
       })
       .catch(error => {
         console.error('Error fetching data:', error);
       });
   }
-
-/*  useEffect(() => {
-    const username = localStorage.getItem('username');
-    const token = localStorage.getItem('token');
-    if (username && token) setApiAuth({ username, token });
-  }, []);*/
 
   const handleSubmit = (event) => {
     event.preventDefault();
@@ -88,7 +85,7 @@ export default function SignInSide() {
               <LockOutlinedIcon />
             </Avatar>
             <Typography component="h1" variant="h5">
-              Sign in
+              Crowd Champion Services Sign-in
             </Typography>
             <Box component="form" noValidate onSubmit={handleSubmit} sx={{ mt: 1 }}>
               <TextField
