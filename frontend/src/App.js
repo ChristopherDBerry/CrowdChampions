@@ -1,33 +1,16 @@
-import React, { useState, useEffect } from 'react';
-import axios from 'axios';
+import React, { createContext, useContext, useState } from 'react';
+import { ApiAuthProvider } from './ApiAuthContext';
+import Button from '@mui/material/Button';
+import SignInSide from './SignInSide'
 
-function App() {
-  const [data, setData] = useState([]);
-  const token = ''; // Replace with the actual token
 
-  useEffect(() => {
-    const config = {
-      headers: {
-        Authorization: `Token ${token}`
-      }
-    };
-
-    axios.get('http://localhost:8000/api/twitter/clients/', config)
-      .then(response => {
-        setData(response.data);
-      })
-      .catch(error => {
-        console.error('Error fetching data:', error);
-      });
-  }, []);
-
+export default function App() {
   return (
-    <div>
-      {data.map(item => (
-        <div key={item.id}>{item.username}</div>
-      ))}
-    </div>
+    <ApiAuthProvider>
+      <div>
+        <SignInSide />
+        <Button variant="contained">Hello world</Button>
+      </div>
+    </ApiAuthProvider>
   );
 }
-
-export default App;
