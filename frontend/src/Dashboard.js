@@ -9,7 +9,9 @@ import List from '@mui/material/List';
 import Typography from '@mui/material/Typography';
 import Divider from '@mui/material/Divider';
 import IconButton from '@mui/material/IconButton';
-import Logout from '@mui/icons-material/Logout';
+
+//import Logout from '@mui/icons-material/Logout';
+
 import Container from '@mui/material/Container';
 import Grid from '@mui/material/Grid';
 import Paper from '@mui/material/Paper';
@@ -21,6 +23,7 @@ import { mainListItems, secondaryListItems } from './listItems';
 import Chart from './Chart';
 import Deposits from './Deposits';
 import Orders from './Orders';
+import Logout from './Logout';
 
 function Copyright(props) {
   return (
@@ -121,11 +124,9 @@ export default function Dashboard() {
             >
               Crowd Champion Services
             </Typography>
-            <IconButton color="inherit">
-              <Logout color="inherit">
-                <NotificationsIcon />
-              </Logout>
-            </IconButton>
+
+            <Logout />
+
           </Toolbar>
         </AppBar>
         <Drawer variant="permanent" open={open}>

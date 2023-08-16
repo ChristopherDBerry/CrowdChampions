@@ -36,7 +36,7 @@ export default function SignInSide() {
         setApiAuth({ username, token });
         localStorage.setItem('username', username);
         localStorage.setItem('token', token);
-        history.push('/main');
+        history.push('/dashboard');
       })
       .catch(error => {
         console.error('Error fetching data:', error);
