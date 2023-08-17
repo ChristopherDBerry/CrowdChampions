@@ -118,7 +118,7 @@ class GenerateClientToken(APIView):
     serializer_class = GenerateClientTokenSerializer
 
     def post(self, request):
-        serializer = self.serializer_class
+        serializer = self.serializer_class(data=request.data)
         serializer.is_valid(raise_exception=True)
 
         client_id = serializer.validated_data['client_id']
