@@ -39,8 +39,7 @@ export default function Clients() {
     axios.get(GET_USER_CLIENTS_URL, config)
       .then(response => {
         console.log(response.data);
-        setRows([]);
-        response.data.map((row) => (setRows(prev => [...prev, row])));
+        setRows(response.data);
       })
       .catch(error => {
         console.error('Error fetching data:', error);
