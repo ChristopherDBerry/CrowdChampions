@@ -192,15 +192,6 @@ export default function Tweets({ clientId }) {
         <Grid item xs={12}>
         </Grid>
         <Grid item xs={12}>
-          <InputLabel>Preview tweet</InputLabel>
-          <TextareaAutosize
-              value={tweetBody}
-              style={{ width: '100%', padding: '10px' }}
-              minRows={3}
-              disabled
-            />
-        </Grid>
-        <Grid item xs={12}>
           <FormControl fullWidth>
             <InputLabel>Select tweet</InputLabel>
             <Select size="small" onChange={handleTweetChange} value={selectedTweet}>

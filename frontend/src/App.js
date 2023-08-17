@@ -6,7 +6,6 @@ import Button from '@mui/material/Button';
 import SignInSide from './SignInSide'
 
 import { ApiAuthProvider } from './ApiAuthContext';
-import Main from './Main';
 import Dashboard from './Dashboard';
 import ManageTweets from './ManageTweets';
 import PrivateRoute  from './PrivateRoute';
