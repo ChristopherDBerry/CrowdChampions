@@ -1,4 +1,4 @@
-Overview
+#Overview
 
 I set up a Docker environment with Django rest framework on the backend and React frontend, with Celery handling task management.
 
@@ -14,8 +14,7 @@ The project took 3-4 days (including time to document and record the videos).
 
 Unfortunately I ran out of time before I could finish the React part of the project, please view this code as ‘work in progress’ (details in the videos). However, the Django / Celery backend is working very well.
 
-Spec
-====
+#Spec
 
 We are a community management company.
 We have several users and several clients.
