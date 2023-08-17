@@ -1,5 +1,6 @@
 from django.contrib.auth.models import User
 from django.db import models
+from .utils import send_tweet
 from django_celery_beat.models import (IntervalSchedule,
                                        CrontabSchedule)
 
@@ -71,3 +72,13 @@ class ManagedTweet(models.Model):
 
     def __str__(self):
         return self.name
+
+    def save(self, *args, **kwargs):
+        send = False
+        if not self.pk:
+            send = True
+        super(ManagedTweet, self).save(*args, **kwargs)
+        if send:
+            # Send tweet only for newly created instances without schedule
+            if not self.interval_schedule and not self.crontab_schedule:
+                send_tweet(self)
