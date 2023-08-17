@@ -5,6 +5,12 @@ from . import views
 
 router = routers.DefaultRouter()
 router.register(r"clients", views.ClientViewSet, basename="client")
+router.register(
+    r"interval-schedules", views.IntervalScheduleViewSet,
+    basename="interval-schedule")
+router.register(
+    r"managed-tweets", views.ManagedTweetViewSet,
+    basename="managed-tweet")
 
 app_name = "cctwitter"
 

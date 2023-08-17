@@ -5,6 +5,13 @@ Serializers for the cctwitter app.
 from rest_framework import serializers
 
 from .models import Client, ManagedTweet
+from django_celery_beat.models import IntervalSchedule
+
+
+class IntervalScheduleSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = IntervalSchedule
+        fields = '__all__'
 
 
 class ClientSerializer(serializers.ModelSerializer):

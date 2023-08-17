@@ -9,12 +9,31 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 
 from .models import Client, ManagedTweet
+from django_celery_beat.models import IntervalSchedule
 from .serializers import *
+
+
+class ManagedTweetViewSet(viewsets.ModelViewSet):
+    """
+    API endpoints for managed tweets
+    """
+    queryset = ManagedTweet.objects.all().order_by('-id')
+    serializer_class = ManagedTweetSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+
+class IntervalScheduleViewSet(viewsets.ModelViewSet):
+    """
+    API endpoints for interval schedules
+    """
+    queryset = IntervalSchedule.objects.all().order_by('-id')
+    serializer_class = IntervalScheduleSerializer
+    permission_classes = [permissions.IsAuthenticated]
 
 
 class ClientViewSet(viewsets.ModelViewSet):
     """
-    API endpoint for twitter clients
+    API endpoints for twitter clients
     """
     queryset = Client.objects.all().order_by('-id')
     serializer_class = ClientSerializer
