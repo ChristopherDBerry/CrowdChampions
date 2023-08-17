@@ -107,6 +107,8 @@ export default function Tweets({ clientId }) {
     const body = data.get('body');
     const owner = data.get('clientId');
     const submitData = { name, body, owner };
+    const interval = data.get('interval');
+    if (interval) submitData.interval_schedule = interval;
     console.log(submitData);
     saveTweet(submitData);
   }
@@ -254,7 +256,11 @@ export default function Tweets({ clientId }) {
         </Grid>
         <Grid item xs={12}>
           <InputLabel>Interval</InputLabel>
-          <Select size="small" onChange={handleIntervalChange} value={selectedInterval}>
+          <Select
+            name="interval"
+            size="small"
+            onChange={handleIntervalChange}
+            value={selectedInterval}>
             <MenuItem key={0} value={0}>Send immediately</MenuItem>
             {intervals.map((interval) => (
               <MenuItem key={interval.id} value={interval.id}>Every {interval.every} {interval.period}</MenuItem>
