@@ -39,7 +39,6 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
-    "orders.apps.OrdersConfig", #XXX
     "rest_framework",
     'rest_framework.authtoken',
     "corsheaders",
@@ -159,10 +158,10 @@ ADMINS = [("testuser", "test.user@email.com"), ]
 
 #XXX DO NOT COMMIT!
 #Prompt developer to enter App credentials
-TWITTER_CONSUMER_KEY = '22Hi1AotRHMmgUqzOgoNT20sF'
-TWITTER_CONSUMER_SECRET = '6tq29Tz4hj4uuX43nz7eq0uxet0L3WUjfBr5Xg1MKCthZb2P3Q'
-TWITTER_ACCESS_TOKEN = '1683731126941020160-fvz59csIkmapmCTWlWFSyWuGqlg8vI'
-TWITTER_TOKEN_SECRET = 'Cd8WaKSkHH4ZZdGVT1SpIDvDSgQgNUFJYOMaNIsXB7Dbi'
+TWITTER_CONSUMER_KEY = ''
+TWITTER_CONSUMER_SECRET = ''
+TWITTER_ACCESS_TOKEN = ''
+TWITTER_TOKEN_SECRET = ''
 
 
 REST_FRAMEWORK = {
