@@ -197,7 +197,7 @@ export default function Clients() {
               <TableCell>{row.access_key ? "Yes" : "No"}</TableCell>
               <TableCell>
                 {row.access_key ?
-                  <Link to={`/manage-tweets/${row.id}`}>
+                  <Link to={`/dashboard/manage-tweets/${row.id}`}>
                     <Button variant="contained" sx={{ mt: 3, mb: 2 }}>Manage Tweets</Button>
                   </Link>
                   :

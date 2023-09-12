@@ -1,14 +1,15 @@
-import React, { createContext, useContext, useState } from 'react';
-import { BrowserRouter as Router, Route, Switch, Redirect } from 'react-router-dom';
+import React, { createContext, useContext, useState } from 'react'
+import { BrowserRouter as Router, Route, Switch, Redirect } from 'react-router-dom'
 
 
-import Button from '@mui/material/Button';
+import Button from '@mui/material/Button'
 import SignInSide from './components/SignInSide'
 
-import { ApiAuthProvider } from './components/ApiAuthContext';
-import Dashboard from './components/Dashboard';
-import ManageTweets from './components/ManageTweets';
-import PrivateRoute  from './components/PrivateRoute';
+import { ApiAuthProvider } from './components/ApiAuthContext'
+import Dashboard from './components/Dashboard'
+import Clients from './components/Clients'
+import Tweets from './components/Tweets'
+import PrivateRoute  from './components/PrivateRoute'
 
 
 export default function App() {
@@ -18,8 +19,16 @@ export default function App() {
       <Router>
         <Switch>
           <Route exact path={['/', '/login']} component={SignInSide} />
-          <PrivateRoute path="/dashboard" component={Dashboard} />
-          <PrivateRoute path="/manage-tweets/:id" component={ManageTweets} />
+          <PrivateRoute exact path="/dashboard">
+            <Dashboard>
+              <Clients />
+            </Dashboard>
+          </PrivateRoute>
+          <PrivateRoute path="/dashboard/manage-tweets/:id">
+            <Dashboard>
+              <Tweets />
+            </Dashboard>
+          </PrivateRoute>
         </Switch>
       </Router>
     </ApiAuthProvider>
