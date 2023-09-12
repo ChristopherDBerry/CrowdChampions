@@ -3,12 +3,12 @@ import { BrowserRouter as Router, Route, Switch, Redirect } from 'react-router-d
 
 
 import Button from '@mui/material/Button';
-import SignInSide from './SignInSide'
+import SignInSide from './components/SignInSide'
 
-import { ApiAuthProvider } from './ApiAuthContext';
-import Dashboard from './Dashboard';
-import ManageTweets from './ManageTweets';
-import PrivateRoute  from './PrivateRoute';
+import { ApiAuthProvider } from './components/ApiAuthContext';
+import Dashboard from './components/Dashboard';
+import ManageTweets from './components/ManageTweets';
+import PrivateRoute  from './components/PrivateRoute';
 
 
 export default function App() {

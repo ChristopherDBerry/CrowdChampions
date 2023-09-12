@@ -18,7 +18,7 @@ import Typography from '@mui/material/Typography';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 
 import { useApiAuthContext  } from './ApiAuthContext';
-import { AUTH_URL } from './endpoints';
+import { AUTH_URL } from '../utils/endpoints';
 
 // TODO remove, this demo shouldn't need to reset the theme.
 

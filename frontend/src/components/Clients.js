@@ -18,7 +18,7 @@ import Grid from '@mui/material/Grid';
 import Title from './Title';
 import { useApiAuthContext  } from './ApiAuthContext';
 import { GET_USER_CLIENTS_URL, GET_CLIENT_AUTH_URL,
-  SET_CLIENT_TOKEN_URL } from './endpoints';
+  SET_CLIENT_TOKEN_URL } from '../utils/endpoints';
 
 
 export default function Clients() {

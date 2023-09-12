@@ -20,7 +20,7 @@ import Box from '@mui/material/Box';
 import Title from './Title';
 import { useApiAuthContext  } from './ApiAuthContext';
 import { GET_CLIENTS_URL, GET_CLIENT_TWEETS_URL,
-  GET_INTERVAL_SCHEDULE_URL, MANAGED_TWEETS_URL } from './endpoints';
+  GET_INTERVAL_SCHEDULE_URL, MANAGED_TWEETS_URL } from '../utils/endpoints';
 
 
 export default function Tweets({ clientId }) {
