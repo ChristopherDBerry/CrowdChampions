@@ -49,7 +49,7 @@ export default function Clients() {
   const [clientAuth, setClientAuth] = React.useState(
     {url: '', pin: ''});
 
-  function get_client_auth_url(clientId) {
+  function getClientAuthUrl(clientId) {
     const token = apiAuth.token;
     if (!token) return
     console.log(token)
@@ -68,7 +68,7 @@ export default function Clients() {
       });
   }
 
-  function set_client_auth(clientId, pin) {
+  function setClientToken(clientId, pin) {
     const token = apiAuth.token;
     if (!token) return
     const config = {
@@ -93,7 +93,7 @@ export default function Clients() {
 
   const handleOpenPin = (clientId) => {
     setClientId(clientId);
-    get_client_auth_url(clientId)
+    getClientAuthUrl(clientId)
     setOpen(true);
   };
 
@@ -106,7 +106,7 @@ export default function Clients() {
     const data = new FormData(event.currentTarget);
     const pin = data.get('pin');
     const clientId = data.get('clientId');
-    set_client_auth(clientId, pin)
+    setClientToken(clientId, pin)
     handleClosePin();
   };
 

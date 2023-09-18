@@ -1,6 +1,6 @@
 import axios from 'axios';
-
 import * as React from 'react';
+import { useParams } from 'react-router-dom';
 
 import InputLabel from '@mui/material/InputLabel';
 import MenuItem from '@mui/material/MenuItem';
@@ -21,43 +21,41 @@ import Title from './Title';
 import { useApiAuthContext  } from './ApiAuthContext';
 import { GET_CLIENTS_URL, GET_CLIENT_TWEETS_URL,
   GET_INTERVAL_SCHEDULE_URL, MANAGED_TWEETS_URL } from '../utils/endpoints';
+import { processData } from '../utils/common'
 
 
-export default function Tweets({ clientId }) {
+export default function Tweets() {
 
-  const [username, setUsername] = React.useState('');
+  const { clientId } = useParams()
 
-  const [tweets, setTweets] = React.useState([]);
-
-  const [tweetBody, setTweetBody] = React.useState('');
-
-  const [selectedTweet, setSelectedTweet] = React.useState(0);
-
-  const [tweetVariables, setTweetVariables] = React.useState([]);
-
+  const [username, setUsername] = React.useState('')
+  const [tweets, setTweets] = React.useState([])
+  const [tweetBody, setTweetBody] = React.useState('')
+  const [selectedTweet, setSelectedTweet] = React.useState(0)
+  const [tweetVariables, setTweetVariables] = React.useState([])
   const [tweetVariablesSequence, setTweetVariablesSequence
-  ] = React.useState([0]);
+  ] = React.useState([0])
+  const [tweetVariablesText, setTweetVariablesText] = React.useState('')
+  const [allTweetVariables, setAllTweetVariables] = React.useState({})
+  const [selectedInterval, setSelectedInterval] = React.useState(0)
+  const [intervals, setIntervals] = React.useState([])
 
-  const [tweetVariablesText, setTweetVariablesText] = React.useState('');
-
-  const [allTweetVariables, setAllTweetVariables] = React.useState({});
-
-  const [selectedInterval, setSelectedInterval] = React.useState(0);
-
-  const [intervals, setIntervals] = React.useState([]);
+  const { apiAuth } = useApiAuthContext()
+  const token = apiAuth.token //XXX store in global context with redirect to login
+  console.log(token)
 
   const handleIntervalChange = (event) => {
-    setSelectedInterval(event.target.value);
-  };
+    setSelectedInterval(event.target.value)
+  }
 
   const handleTweetVariablesText = (event) => {
     setAllTweetVariables(
       { ...allTweetVariables, [event.target.id]: event.target.value })
-  };
+  }
 
   const handleTweetVariablesSequence = (event) => {
     event.preventDefault();
-    setTweetVariablesSequence([...tweetVariablesSequence, 0]);
+    setTweetVariablesSequence([...tweetVariablesSequence, 0])
   };
 
   const handleTweetChange = (event) => {
@@ -98,7 +96,6 @@ export default function Tweets({ clientId }) {
       });
   }
 
-
   const handleSaveTweet = (event) => {
     event.preventDefault();
     console.log('save')
@@ -113,75 +110,26 @@ export default function Tweets({ clientId }) {
     saveTweet(submitData);
   }
 
-  const { apiAuth } = useApiAuthContext();
-
   function getClient() {
-    const token = apiAuth.token;
-    if (!token) return
-    const config = {
-      headers: {
-        Authorization: `Token ${token}`
-      }
-    };
-
-    axios.get(`${GET_CLIENTS_URL}${clientId}`, config)
-      .then(response => {
-        setUsername(response.data.username)
-      })
-      .catch(error => {
-        console.error('Error fetching data:', error);
-      });
+    processData(`${GET_CLIENTS_URL}${clientId}`,
+      token, (data) => setUsername(data.username))
   }
 
   function getTweets() {
-    const token = apiAuth.token;
-    if (!token) return
-    const config = {
-      headers: {
-        Authorization: `Token ${token}`
-      }
-    };
-
-    axios.get(`${GET_CLIENT_TWEETS_URL}${clientId}`, config)
-      .then(response => {
-        console.log(response.data);
-        setTweets(response.data);
-      })
-      .catch(error => {
-        console.error('Error fetching data:', error);
-      });
+    processData(`${GET_CLIENT_TWEETS_URL}${clientId}`,
+      token, setTweets)
   }
 
   function getIntervals() {
-    const token = apiAuth.token;
-    if (!token) return
-    const config = {
-      headers: {
-        Authorization: `Token ${token}`
-      }
-    };
-
-    axios.get(GET_INTERVAL_SCHEDULE_URL, config)
-      .then(response => {
-        console.log(response.data);
-        setIntervals(response.data);
-      })
-      .catch(error => {
-        console.error('Error fetching data:', error);
-      });
+    processData(GET_INTERVAL_SCHEDULE_URL,
+      token, setIntervals)
   }
 
   React.useEffect(() => {
-    getClient();
-  }, [apiAuth]);
-
-  React.useEffect(() => {
-    getTweets();
-  }, [apiAuth]);
-
-  React.useEffect(() => {
-    getIntervals();
-  }, [apiAuth]);
+    getClient()
+    getTweets()
+    getIntervals()
+  }, [])
 
   return (
     <React.Fragment>

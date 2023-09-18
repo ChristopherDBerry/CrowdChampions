@@ -24,7 +24,7 @@ export default function App() {
               <Clients />
             </Dashboard>
           </PrivateRoute>
-          <PrivateRoute path="/dashboard/manage-tweets/:id">
+          <PrivateRoute path="/dashboard/manage-tweets/:clientId">
             <Dashboard>
               <Tweets />
             </Dashboard>
