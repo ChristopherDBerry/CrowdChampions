@@ -13,6 +13,8 @@ https://docs.djangoproject.com/en/3.2/ref/settings/
 import os
 from pathlib import Path
 
+import keys
+
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -158,10 +160,10 @@ ADMINS = [("testuser", "test.user@email.com"), ]
 
 #XXX DO NOT COMMIT!
 #Prompt developer to enter App credentials
-TWITTER_CONSUMER_KEY = ''
-TWITTER_CONSUMER_SECRET = ''
-TWITTER_ACCESS_TOKEN = ''
-TWITTER_TOKEN_SECRET = ''
+TWITTER_CONSUMER_KEY = keys.TWITTER_CONSUMER_KEY
+TWITTER_CONSUMER_SECRET = keys.TWITTER_CONSUMER_SECRET
+TWITTER_ACCESS_TOKEN = keys.TWITTER_ACCESS_TOKEN
+TWITTER_TOKEN_SECRET = keys.TWITTER_TOKEN_SECRET
 
 
 REST_FRAMEWORK = {
@@ -171,3 +173,4 @@ REST_FRAMEWORK = {
     ],
     'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
 }
+
