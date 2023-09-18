@@ -1,4 +1,5 @@
 *.pyc
+*.swp
 __pycache__
 env
 *.sqlite3
@@ -6,3 +7,4 @@ env
 project/static
 project/media
 staticfiles
+project/core/keys.py
