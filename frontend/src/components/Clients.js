@@ -19,77 +19,40 @@ import Title from './Title';
 import { useApiAuthContext  } from './ApiAuthContext';
 import { GET_USER_CLIENTS_URL, GET_CLIENT_AUTH_URL,
   SET_CLIENT_TOKEN_URL } from '../utils/endpoints';
-
+import { processData } from '../utils/common';
 
 export default function Clients() {
 
-  const [rows, setRows] = React.useState([]);
-
   const { apiAuth } = useApiAuthContext();
+  const token = apiAuth.token;
 
-  function getClients() {
-    const token = apiAuth.token;
-    if (!token) return
-    const config = {
-      headers: {
-        Authorization: `Token ${token}`
-      }
-    };
-
-    axios.get(GET_USER_CLIENTS_URL, config)
-      .then(response => {
-        console.log(response.data);
-        setRows(response.data);
-      })
-      .catch(error => {
-        console.error('Error fetching data:', error);
-      });
-  }
-
+  const [rows, setRows] = React.useState([]);
   const [clientAuth, setClientAuth] = React.useState(
     {url: '', pin: ''});
-
-  function getClientAuthUrl(clientId) {
-    const token = apiAuth.token;
-    if (!token) return
-    console.log(token)
-    const config = {
-      headers: {
-        Authorization: `Token ${token}`
-      },
-    };
-    axios.get(`${GET_CLIENT_AUTH_URL}${clientId}/`, config)
-      .then(response => {
-        console.log(response.data);
-        setClientAuth({url: response.data.authorization_url, pin: ''});
-      })
-      .catch(error => {
-        console.error('Error fetching data:', error);
-      });
-  }
-
-  function setClientToken(clientId, pin) {
-    const token = apiAuth.token;
-    if (!token) return
-    const config = {
-      headers: {
-        Authorization: `Token ${token}`
-      },
-    };
-    axios.post(SET_CLIENT_TOKEN_URL,
-      {pin: pin, client_id: clientId}, config)
-      .then(response => {
-        console.log(response.data);
-        setUpdatedClients(prev => prev + 1);
-      })
-      .catch(error => {
-        console.error('Error fetching data:', error);
-      });
-  }
-
   const [open, setOpen] = React.useState(false);
   const [clientId, setClientId] = React.useState(false);
   const [updatedClients, setUpdatedClients] = React.useState(0);
+
+  function getClients() {
+    processData(GET_USER_CLIENTS_URL,
+      token, setRows)
+  }
+
+  function getClientAuthUrl(clientId) {
+    processData(`${GET_CLIENT_AUTH_URL}${clientId}/`,
+      token, (data) => {
+        setClientAuth({url: data.authorization_url, pin: ''})
+      }
+    )
+  }
+
+  function setClientToken(clientId, pin) {
+    processData(SET_CLIENT_TOKEN_URL,
+      token, ({pin: pin, client_id: clientId}) => {
+        setUpdatedClients(prev => prev + 1);
+      }, 'post', {pin: pin, client_id: clientId}
+    )
+  }
 
   const handleOpenPin = (clientId) => {
     setClientId(clientId);

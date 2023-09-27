@@ -21,7 +21,7 @@ import Title from './Title';
 import { useApiAuthContext  } from './ApiAuthContext';
 import { GET_CLIENTS_URL, GET_CLIENT_TWEETS_URL,
   GET_INTERVAL_SCHEDULE_URL, MANAGED_TWEETS_URL } from '../utils/endpoints';
-import { processData } from '../utils/common'
+import { processData } from '../utils/common';
 
 
 export default function Tweets() {
@@ -41,8 +41,7 @@ export default function Tweets() {
   const [intervals, setIntervals] = React.useState([])
 
   const { apiAuth } = useApiAuthContext()
-  const token = apiAuth.token //XXX store in global context with redirect to login
-  console.log(token)
+  const token = apiAuth.token
 
   const handleIntervalChange = (event) => {
     setSelectedInterval(event.target.value)
@@ -79,23 +78,6 @@ export default function Tweets() {
     setTweetVariables(variables);
   }
 
-  function saveTweet(data) {
-    const token = apiAuth.token;
-    if (!token) return
-    const config = {
-      headers: {
-        Authorization: `Token ${token}`
-      }
-    };
-    axios.post(MANAGED_TWEETS_URL, data, config)
-      .then(response => {
-        console.log(response.data);
-      })
-      .catch(error => {
-        console.error('Error fetching data:', error);
-      });
-  }
-
   const handleSaveTweet = (event) => {
     event.preventDefault();
     console.log('save')
@@ -123,6 +105,11 @@ export default function Tweets() {
   function getIntervals() {
     processData(GET_INTERVAL_SCHEDULE_URL,
       token, setIntervals)
+  }
+
+  function saveTweet(data) {
+    processData(MANAGED_TWEETS_URL, token,
+      (data) => console.log(data))
   }
 
   React.useEffect(() => {
