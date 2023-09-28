@@ -9,8 +9,21 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 
 from .models import Client, ManagedTweet
+from django.contrib.auth.models import User
 from django_celery_beat.models import IntervalSchedule
 from .serializers import *
+
+
+class UserViewSet(viewsets.ModelViewSet):
+    """
+    API endpoints for users
+    """
+    queryset = User.objects.all().order_by('-id')
+    serializer_class = UserSerializer
+    permission_classes = [permissions.IsAuthenticated]
+    #add lookup fields to viewset of 'id' and 'username'
+    lookup_field = 'id'
+    lookup_field = 'username'
 
 
 class ManagedTweetViewSet(viewsets.ModelViewSet):
