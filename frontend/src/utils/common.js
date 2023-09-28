@@ -20,7 +20,6 @@ export function processData(
       callback(response.data);
     })
     .catch(error => {
-      if (callbackError) callbackError(error);
-      else console.error('Error fetching data:', error);
+      console.error('Error fetching data:', error);
     })
 }

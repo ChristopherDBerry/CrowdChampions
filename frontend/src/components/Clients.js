@@ -18,13 +18,14 @@ import Grid from '@mui/material/Grid';
 import Title from './Title';
 import { useApiAuthContext  } from './ApiAuthContext';
 import { GET_USER_CLIENTS_URL, GET_CLIENT_AUTH_URL,
-  SET_CLIENT_TOKEN_URL } from '../utils/endpoints';
+  SET_CLIENT_TOKEN_URL, ADD_CLIENT_URL } from '../utils/endpoints';
 import { processData } from '../utils/common';
 
 export default function Clients() {
 
   const { apiAuth } = useApiAuthContext();
   const token = apiAuth.token;
+  const userId = localStorage.getItem('userId');
 
   const [rows, setRows] = React.useState([]);
   const [clientAuth, setClientAuth] = React.useState(
@@ -32,6 +33,7 @@ export default function Clients() {
   const [open, setOpen] = React.useState(false);
   const [clientId, setClientId] = React.useState(false);
   const [updatedClients, setUpdatedClients] = React.useState(0);
+  const [openAddClient, setOpenAddClient] = React.useState(false);
 
   function getClients() {
     processData(GET_USER_CLIENTS_URL,
@@ -46,22 +48,38 @@ export default function Clients() {
     )
   }
 
+  function addClient(username) {
+    processData(ADD_CLIENT_URL,
+      token, ({username}) => {
+        setUpdatedClients(prev => prev + 1);
+      }, 'post', {username, owner: userId}
+    )
+  }
+
   function setClientToken(clientId, pin) {
     processData(SET_CLIENT_TOKEN_URL,
-      token, ({pin: pin, client_id: clientId}) => {
+      token, ({pin, client_id: clientId}) => {
         setUpdatedClients(prev => prev + 1);
-      }, 'post', {pin: pin, client_id: clientId}
+      }, 'post', {pin, client_id: clientId}
     )
   }
 
   const handleOpenPin = (clientId) => {
     setClientId(clientId);
-    getClientAuthUrl(clientId)
+    getClientAuthUrl(clientId);
     setOpen(true);
+  };
+
+  const handleOpenAddClient = (clientId) => {
+    setOpenAddClient(true);
   };
 
   const handleClosePin = () => {
     setOpen(false);
+  };
+
+  const handleCloseAddClient = () => {
+    setOpenAddClient(false);
   };
 
   const handleSubmitPin = (event) => {
@@ -73,12 +91,70 @@ export default function Clients() {
     handleClosePin();
   };
 
+  const handleSubmitAddClient = (event) => {
+    event.preventDefault();
+    const data = new FormData(event.currentTarget);
+    const username = data.get('username');
+    addClient(username);
+    handleCloseAddClient();
+  };
+
   React.useEffect(() => {
     getClients();
   }, [apiAuth, updatedClients]);
 
   return (
     <React.Fragment>
+      <Modal
+        open={openAddClient}
+        onClose={handleCloseAddClient}
+        aria-labelledby="modal-title"
+        aria-describedby="modal-description"
+      >
+        <div
+          style={{
+            position: 'absolute',
+            top: '50%',
+            left: '50%',
+            transform: 'translate(-50%, -50%)',
+            width: 770,
+            bgcolor: 'white',
+            boxShadow: 24,
+            p: 4,
+          }}
+        >
+          <Paper style={{padding: '18px'}} elevation={3}>
+            <h2 id="modal-title">Add client</h2>
+            <p id="modal-description">
+              Enter details to set up new client</p>
+            <Box component="form" noValidate onSubmit={handleSubmitAddClient} sx={{ mt: 1 }}>
+              <input type="hidden" name="clientId" value={clientId} />
+              <Grid container spacing={2}>
+                <Grid item xs={12}>
+                    <TextField
+                      fullWidth
+                      margin="normal"
+                      required
+                      id="username"
+                      label="Username"
+                      name="username"
+                      autoFocus
+                    />
+                </Grid>
+                <Grid item xs={12}>
+                  <Button
+                    type="submit"
+                    fullWidth
+                    variant="contained"
+                    sx={{ mt: 3, mb: 2 }}
+                  >Add user</Button>
+                </Grid>
+              </Grid>
+            </Box>
+          </Paper>
+        </div>
+      </Modal>
+
       <Modal
         open={open}
         onClose={handleClosePin}
@@ -144,7 +220,8 @@ export default function Clients() {
 
 
       <Title>Your Clients</Title>
-      <Button variant="contained" sx={{ mt: 3, mb: 2, width: '200px' }}>Add new client</Button>
+      <Button variant="contained" sx={{ mt: 3, mb: 2, width: '200px' }}
+        onClick={handleOpenAddClient}>Add new client</Button>
       <Table size="small">
         <TableHead>
           <TableRow>

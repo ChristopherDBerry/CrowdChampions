@@ -18,30 +18,37 @@ import Typography from '@mui/material/Typography';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 
 import { useApiAuthContext  } from './ApiAuthContext';
-import { AUTH_URL } from '../utils/endpoints';
-
-// TODO remove, this demo shouldn't need to reset the theme.
+import { AUTH_URL, GET_USER_URL } from '../utils/endpoints';
+import { processData } from '../utils/common';
 
 const defaultTheme = createTheme();
 
 export default function SignInSide() {
 
   const history = useHistory();
-  const { apiAuth, setApiAuth } = useApiAuthContext();
+  const { apiAuth, setApiAuth } = useApiAuthContext()
 
   function generateToken(username, password) {
     axios.post(AUTH_URL, {username, password})
       .then(response => {
         const token = response.data.token;
         setApiAuth({ username, token });
-        //TODO: replace with cookie, more appropriate
         localStorage.setItem('username', username);
         localStorage.setItem('token', token);
+        setUserId(username, token);
         history.push('/dashboard');
       })
       .catch(error => {
         console.error('Error fetching data:', error);
       });
+  }
+
+  function setUserId(username, token) {
+    processData(`${GET_USER_URL}${username}/`,
+      token, (data) => {
+        localStorage.setItem('userId', data.id);
+      }
+    )
   }
 
   const handleSubmit = (event) => {
