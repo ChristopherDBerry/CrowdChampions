@@ -26,12 +26,20 @@ import { processData } from '../utils/common';
 
 export default function Tweets() {
 
+  const unselectedTweet = {
+    id: 'add',
+    name: '',
+    body: '',
+    interval_schedule: 0,
+  }
+
   const { clientId } = useParams()
 
   const [username, setUsername] = React.useState('')
   const [tweets, setTweets] = React.useState([])
   const [tweetBody, setTweetBody] = React.useState('')
-  const [selectedTweet, setSelectedTweet] = React.useState(0)
+  const [selectedTweetId, setSelectedTweetId] = React.useState('add')
+  const [selectedTweet, setSelectedTweet] = React.useState(unselectedTweet)
   const [tweetVariables, setTweetVariables] = React.useState([])
   const [tweetVariablesSequence, setTweetVariablesSequence
   ] = React.useState([0])
@@ -43,8 +51,22 @@ export default function Tweets() {
   const { apiAuth } = useApiAuthContext()
   const token = apiAuth.token
 
+  const handleNameChange = (event) => {
+    setSelectedTweet(prev => {
+      return { ...prev, name: event.target.value}
+    })
+  }
+
+  const handleBodyChange = (event) => {
+    setSelectedTweet(prev => {
+      return { ...prev, body: event.target.value}
+    })
+  }
+
   const handleIntervalChange = (event) => {
-    setSelectedInterval(event.target.value)
+    setSelectedTweet(prev => {
+      return { ...prev, interval_schedule: event.target.value}
+    })
   }
 
   const handleTweetVariablesText = (event) => {
@@ -58,7 +80,7 @@ export default function Tweets() {
   };
 
   const handleTweetChange = (event) => {
-    setSelectedTweet(event.target.value);
+    setSelectedTweetId(event.target.value);
   };
 
   function extractVariablesFromTemplate(fString) {
@@ -112,11 +134,21 @@ export default function Tweets() {
       (data) => console.log(data))
   }
 
+  function loadSelectedTweet() {
+    const tweet = (tweets.find(obj => obj.id === selectedTweetId) ||
+      unselectedTweet);
+    setSelectedTweet(tweet);
+  }
+
+  React.useEffect(() => {
+    loadSelectedTweet()
+  }, [selectedTweetId])
+
   React.useEffect(() => {
     getClient()
     getTweets()
     getIntervals()
-  }, [])
+  }, [apiAuth])
 
   return (
     <React.Fragment>
@@ -129,8 +161,8 @@ export default function Tweets() {
         <Grid item xs={12}>
           <FormControl fullWidth>
             <InputLabel>Select tweet</InputLabel>
-            <Select size="small" onChange={handleTweetChange} value={selectedTweet}>
-              <MenuItem key={0} value={0}>Add new tweet</MenuItem>
+            <Select size="small" onChange={handleTweetChange} value={selectedTweetId}>
+              <MenuItem key='add' value='add'>Add new tweet</MenuItem>
               {tweets.map((tweet) => (
                 <MenuItem key={tweet.id} value={tweet.id}>{tweet.name}</MenuItem>
               ))}
@@ -139,7 +171,11 @@ export default function Tweets() {
         </Grid>
         <Grid item xs={12}>
           <InputLabel>Tweet name</InputLabel>
-          <TextField size="small" name='name' />
+          <TextField
+            size="small" name='name'
+            value={selectedTweet.name}
+            onChange={handleNameChange}
+          />
         </Grid>
         <Grid item xs={12}>
           <InputLabel>Tweet text</InputLabel>
@@ -149,6 +185,8 @@ export default function Tweets() {
             style={{ width: '100%', padding: '10px' }}
             minRows={3}
             placeholder="Tweet text goes here. You can insert args using curly braces eg {arg1}"
+            value={selectedTweet.body}
+            onChange={handleBodyChange}
           />
         </Grid>
         <Grid item xs={12}>
@@ -186,7 +224,7 @@ export default function Tweets() {
             name="interval"
             size="small"
             onChange={handleIntervalChange}
-            value={selectedInterval}>
+            value={selectedTweet.interval_schedule}>
             <MenuItem key={0} value={0}>Send immediately</MenuItem>
             {intervals.map((interval) => (
               <MenuItem key={interval.id} value={interval.id}>Every {interval.every} {interval.period}</MenuItem>
