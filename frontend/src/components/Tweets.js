@@ -7,13 +7,9 @@ import MenuItem from '@mui/material/MenuItem';
 import FormControl from '@mui/material/FormControl';
 import Select from '@mui/material/Select';
 import Button from '@mui/material/Button';
-import { TextareaAutosize } from '@mui/base/TextareaAutosize';
+
 import Grid from '@mui/material/Grid';
-import Table from '@mui/material/Table';
-import TableBody from '@mui/material/TableBody';
-import TableCell from '@mui/material/TableCell';
-import TableHead from '@mui/material/TableHead';
-import TableRow from '@mui/material/TableRow';
+
 import TextField from '@mui/material/TextField';
 import Box from '@mui/material/Box';
 
@@ -23,6 +19,8 @@ import { GET_CLIENTS_URL, GET_CLIENT_TWEETS_URL,
   GET_INTERVAL_SCHEDULE_URL, MANAGED_TWEETS_URL } from '../utils/endpoints';
 import { processData } from '../utils/common';
 
+import TweetBody from './TweetBody';
+
 
 export default function Tweets() {
 
@@ -30,7 +28,6 @@ export default function Tweets() {
 
   const [username, setUsername] = React.useState('')
   const [tweets, setTweets] = React.useState([])
-  //const [tweetBody, setTweetBody] = React.useState('')
   const [selectedTweetId, setSelectedTweetId] = React.useState('add')
 
   const unselectedTweet = {
@@ -40,11 +37,7 @@ export default function Tweets() {
     interval_schedule: 0,
   }
   const [selectedTweet, setSelectedTweet] = React.useState(unselectedTweet)
-  const [tweetVariables, setTweetVariables] = React.useState([])
-  const [tweetVariablesSequence, setTweetVariablesSequence
-  ] = React.useState([0])
-  const [tweetVariablesText, setTweetVariablesText] = React.useState('')
-  const [allTweetVariables, setAllTweetVariables] = React.useState({})
+
   const [selectedInterval, setSelectedInterval] = React.useState(0)
   const [intervals, setIntervals] = React.useState([])
 
@@ -57,52 +50,15 @@ export default function Tweets() {
     })
   }
 
-  const handleBodyChange = (event) => {
-    const tweetBody = event.target.value;
-    setSelectedTweet(prev => {
-      return { ...prev, body: tweetBody}
-    })
-  }
-
-  const renderExtractedVariables = () => {
-    const variables = extractVariablesFromTemplate(
-      selectedTweet.body);
-    setTweetVariables(variables);
-  }
-
-  React.useEffect(() => {
-    renderExtractedVariables()
-  }, [selectedTweet.body])
-
   const handleIntervalChange = (event) => {
     setSelectedTweet(prev => {
       return { ...prev, interval_schedule: event.target.value}
     })
   }
 
-  const handleTweetVariablesText = (event) => {
-    setAllTweetVariables(
-      { ...allTweetVariables, [event.target.id]: event.target.value })
-  }
-
-  const handleTweetVariablesSequence = (event) => {
-    event.preventDefault();
-    setTweetVariablesSequence([...tweetVariablesSequence, 0])
-  };
-
   const handleTweetChange = (event) => {
     setSelectedTweetId(event.target.value);
   };
-
-  function extractVariablesFromTemplate(fString) {
-    const regex = /\{(\w+)\}/g;
-    const matches = fString.match(regex);
-    if (!matches) {
-      return [];
-    }
-    const uniqueVariables = new Set(matches.map(match => match.substring(1, match.length - 1)));
-    return Array.from(uniqueVariables);
-  }
 
   const handleSaveTweet = (event) => {
     event.preventDefault();
@@ -181,46 +137,9 @@ export default function Tweets() {
             onChange={handleNameChange}
           />
         </Grid>
-        <Grid item xs={12}>
-          <InputLabel>Tweet text</InputLabel>
-          <TextareaAutosize
-            name='body'
-            style={{ width: '100%', padding: '10px' }}
-            minRows={3}
-            placeholder="Tweet text goes here. You can insert args using curly braces eg {arg1}"
-            value={selectedTweet.body}
-            onChange={handleBodyChange}
-          />
-        </Grid>
-        <Grid item xs={12}>
-          <InputLabel>Tweet variables</InputLabel>
-          <Table size="small">
-            <TableHead>
-              <TableRow>
-                {tweetVariables.map((variable) => (
-                  <TableCell key={variable}>{variable}</TableCell>
-                ))}
-              </TableRow>
-            </TableHead>
-            <TableBody>
-            {tweetVariablesSequence.map((row, rowIndex) => (
-              <TableRow key={rowIndex}>
-                {tweetVariables.map((variable, cellIndex) => (
-                  <TableCell key={cellIndex}>
-                    <TextField id={`${cellIndex}-${rowIndex}-${variable}`} className="tweet-variable"
-                      onChange={handleTweetVariablesText} size="small" />
-                  </TableCell>
-                ))}
-              </TableRow>
-            ))}
-            {tweetVariables.length ?
-            <TableRow><TableCell>
-              <Button variant="contained" sx={{ mt: 3, mb: 2 }} onClick={handleTweetVariablesSequence}>
-                Add tweet variables</Button>
-            </TableCell></TableRow> : null}
-            </TableBody>
-          </Table>
-        </Grid>
+
+        <TweetBody selectedTweet={selectedTweet} setSelectedTweet={setSelectedTweet} />
+
         <Grid item xs={12}>
           <InputLabel>Interval</InputLabel>
           <Select
