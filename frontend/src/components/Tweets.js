@@ -26,19 +26,19 @@ import { processData } from '../utils/common';
 
 export default function Tweets() {
 
+  const { clientId } = useParams()
+
+  const [username, setUsername] = React.useState('')
+  const [tweets, setTweets] = React.useState([])
+  //const [tweetBody, setTweetBody] = React.useState('')
+  const [selectedTweetId, setSelectedTweetId] = React.useState('add')
+
   const unselectedTweet = {
     id: 'add',
     name: '',
     body: '',
     interval_schedule: 0,
   }
-
-  const { clientId } = useParams()
-
-  const [username, setUsername] = React.useState('')
-  const [tweets, setTweets] = React.useState([])
-  const [tweetBody, setTweetBody] = React.useState('')
-  const [selectedTweetId, setSelectedTweetId] = React.useState('add')
   const [selectedTweet, setSelectedTweet] = React.useState(unselectedTweet)
   const [tweetVariables, setTweetVariables] = React.useState([])
   const [tweetVariablesSequence, setTweetVariablesSequence
@@ -58,10 +58,21 @@ export default function Tweets() {
   }
 
   const handleBodyChange = (event) => {
+    const tweetBody = event.target.value;
     setSelectedTweet(prev => {
-      return { ...prev, body: event.target.value}
+      return { ...prev, body: tweetBody}
     })
   }
+
+  const renderExtractedVariables = () => {
+    const variables = extractVariablesFromTemplate(
+      selectedTweet.body);
+    setTweetVariables(variables);
+  }
+
+  React.useEffect(() => {
+    renderExtractedVariables()
+  }, [selectedTweet.body])
 
   const handleIntervalChange = (event) => {
     setSelectedTweet(prev => {
@@ -91,13 +102,6 @@ export default function Tweets() {
     }
     const uniqueVariables = new Set(matches.map(match => match.substring(1, match.length - 1)));
     return Array.from(uniqueVariables);
-  }
-
-  const handleChangeTweetText = (event) => {
-    const tweetBody = event.target.value;
-    setTweetBody(tweetBody);
-    const variables = extractVariablesFromTemplate(tweetBody);
-    setTweetVariables(variables);
   }
 
   const handleSaveTweet = (event) => {
@@ -181,7 +185,6 @@ export default function Tweets() {
           <InputLabel>Tweet text</InputLabel>
           <TextareaAutosize
             name='body'
-            onChange={handleChangeTweetText}
             style={{ width: '100%', padding: '10px' }}
             minRows={3}
             placeholder="Tweet text goes here. You can insert args using curly braces eg {arg1}"
