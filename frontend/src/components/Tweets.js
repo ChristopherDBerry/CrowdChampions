@@ -1,4 +1,3 @@
-import axios from 'axios';
 import * as React from 'react';
 import { useParams } from 'react-router-dom';
 
@@ -7,6 +6,8 @@ import MenuItem from '@mui/material/MenuItem';
 import FormControl from '@mui/material/FormControl';
 import Select from '@mui/material/Select';
 import Button from '@mui/material/Button';
+import Checkbox from '@mui/material/Checkbox';
+import FormControlLabel from '@mui/material/FormControlLabel';
 
 import Grid from '@mui/material/Grid';
 
@@ -28,13 +29,17 @@ export default function Tweets() {
 
   const [username, setUsername] = React.useState('')
   const [tweets, setTweets] = React.useState([])
+  const [lastAddedTweetId, setLastAddedTweetId] = React.useState()
   const [selectedTweetId, setSelectedTweetId] = React.useState('add')
 
   const unselectedTweet = {
+    enabled: true,
     id: 'add',
     name: '',
     body: '',
-    interval_schedule: 0,
+    body_template_data: [],
+    interval_schedule: 1,
+    owner: clientId,
   }
   const [selectedTweet, setSelectedTweet] = React.useState(unselectedTweet)
 
@@ -52,7 +57,7 @@ export default function Tweets() {
 
   const handleIntervalChange = (event) => {
     setSelectedTweet(prev => {
-      return { ...prev, interval_schedule: event.target.value}
+      return { ...prev, interval_schedule: event.target.value }
     })
   }
 
@@ -60,18 +65,28 @@ export default function Tweets() {
     setSelectedTweetId(event.target.value);
   };
 
+  const handleEnabledChange = (event) => {
+    setSelectedTweet(prev => {
+      return { ...prev, enabled: event.target.checked}
+    })
+  }
+
   const handleSaveTweet = (event) => {
     event.preventDefault();
-    console.log('save')
-    const data = new FormData(event.currentTarget);
-    const name = data.get('name');
-    const body = data.get('body');
-    const owner = data.get('clientId');
-    const submitData = { name, body, owner };
-    const interval = data.get('interval');
-    if (interval) submitData.interval_schedule = interval;
-    console.log(submitData);
-    saveTweet(submitData);
+    if (selectedTweetId === 'add') {
+      const { id,...rest } = selectedTweet;
+      processData(MANAGED_TWEETS_URL, token,
+        (data) => {
+          setSelectedTweetId(data.id)
+          setLastAddedTweetId(data.id)
+        },
+        'post', rest)
+    }
+    else {
+      processData(`${MANAGED_TWEETS_URL}${selectedTweet.id}/`, token,
+        (data) => console.log(data),
+        'patch', selectedTweet)
+    }
   }
 
   function getClient() {
@@ -80,18 +95,13 @@ export default function Tweets() {
   }
 
   function getTweets() {
-    processData(`${GET_CLIENT_TWEETS_URL}${clientId}`,
-      token, setTweets)
+    processData(`${GET_CLIENT_TWEETS_URL}${clientId}`, token,
+        setTweets)
   }
 
   function getIntervals() {
     processData(GET_INTERVAL_SCHEDULE_URL,
       token, setIntervals)
-  }
-
-  function saveTweet(data) {
-    processData(MANAGED_TWEETS_URL, token,
-      (data) => console.log(data))
   }
 
   function loadSelectedTweet() {
@@ -102,13 +112,16 @@ export default function Tweets() {
 
   React.useEffect(() => {
     loadSelectedTweet()
-  }, [selectedTweetId])
+  }, [tweets, selectedTweetId])
 
   React.useEffect(() => {
     getClient()
-    getTweets()
     getIntervals()
   }, [apiAuth])
+
+  React.useEffect(() => {
+    getTweets()
+  }, [apiAuth, lastAddedTweetId])
 
   return (
     <React.Fragment>
@@ -130,6 +143,18 @@ export default function Tweets() {
           </FormControl>
         </Grid>
         <Grid item xs={12}>
+          <FormControlLabel
+            control={
+              <Checkbox
+                checked={selectedTweet.enabled || false}
+                onChange={handleEnabledChange}
+                color="primary"
+              />
+            }
+            label="Enabled"
+          />
+        </Grid>
+        <Grid item xs={12}>
           <InputLabel>Tweet name</InputLabel>
           <TextField
             size="small" name='name'
@@ -147,7 +172,6 @@ export default function Tweets() {
             size="small"
             onChange={handleIntervalChange}
             value={selectedTweet.interval_schedule}>
-            <MenuItem key={0} value={0}>Send immediately</MenuItem>
             {intervals.map((interval) => (
               <MenuItem key={interval.id} value={interval.id}>Every {interval.every} {interval.period}</MenuItem>
             ))}

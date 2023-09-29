@@ -1,4 +1,4 @@
-import React from 'react';
+import * as React from 'react';
 import Grid from '@mui/material/Grid';
 import { TextareaAutosize } from '@mui/base/TextareaAutosize';
 
@@ -34,10 +34,7 @@ export default function TweetBody({selectedTweet, setSelectedTweet}) {
     setSelectedTweet(prev => {
       const data = prev.body_template_data
       const length = data.length;
-      if (length === 0) return { ...prev }
-      const existingRow = data[length - 1];
-      // New row with existing variable names and empty values
-      const newRow = Object.keys(existingRow).reduce((row, key) => {
+      const newRow = tweetVariables.reduce((row, key) => {
         row[key] = '';
         return row;
       }, {});
@@ -54,7 +51,7 @@ export default function TweetBody({selectedTweet, setSelectedTweet}) {
 
   React.useEffect(() => {
     renderExtractedVariables()
-    console.log(selectedTweet.body_template_data)
+    //console.log(selectedTweet.body_template_data)
   }, [selectedTweet.body])
 
   function extractVariablesFromTemplate(fString) {
