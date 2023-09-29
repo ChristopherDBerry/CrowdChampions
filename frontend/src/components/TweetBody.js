@@ -15,15 +15,10 @@ import TableRow from '@mui/material/TableRow';
 export default function TweetBody({selectedTweet, setSelectedTweet}) {
 
   const [tweetVariables, setTweetVariables] = React.useState([])
-  const [tweetVariablesSequence, setTweetVariablesSequence
-  ] = React.useState([0])
-  const [tweetVariablesText, setTweetVariablesText] = React.useState('')
-  const [allTweetVariables, setAllTweetVariables] = React.useState({})
 
   const handleBodyChange = (event) => {
-    const tweetBody = event.target.value;
     setSelectedTweet(prev => {
-      return { ...prev, body: tweetBody }
+      return { ...prev, body: event.target.value }
     })
   }
 
@@ -34,9 +29,21 @@ export default function TweetBody({selectedTweet, setSelectedTweet}) {
     })
   }
 
-  const handleTweetVariablesSequence = (event) => {
+  const handleAddTweetVariables = (event) => {
     event.preventDefault();
-    setTweetVariablesSequence([...tweetVariablesSequence, 0])
+    setSelectedTweet(prev => {
+      const data = prev.body_template_data
+      const length = data.length;
+      if (length === 0) return { ...prev }
+      const existingRow = data[length - 1];
+      // New row with existing variable names and empty values
+      const newRow = Object.keys(existingRow).reduce((row, key) => {
+        row[key] = '';
+        return row;
+      }, {});
+      data.push(newRow);
+      return { ...prev, body_template_data: data }
+    })
   }
 
   const renderExtractedVariables = () => {
@@ -85,13 +92,13 @@ export default function TweetBody({selectedTweet, setSelectedTweet}) {
           </TableRow>
         </TableHead>
         <TableBody>
-        {tweetVariablesSequence.map((row, rowIndex) => (
+        {selectedTweet?.body_template_data?.map((row, rowIndex) => (
           <TableRow key={rowIndex}>
           {tweetVariables.map((variableName, cellIndex) => (
             <TableCell key={cellIndex}>
             <TextField id={`${cellIndex}-${rowIndex}-${variableName}`} className="tweet-variable"
               onChange={(event) => handleTweetVariablesText(event, rowIndex, variableName)}
-              value={selectedTweet.body_template_data?.[rowIndex]?.[variableName] || ''}
+              value={row?.[variableName] || ''}
               size="small" />
             </TableCell>
           ))}
@@ -99,7 +106,7 @@ export default function TweetBody({selectedTweet, setSelectedTweet}) {
         ))}
         {tweetVariables.length ?
         <TableRow><TableCell>
-          <Button variant="contained" sx={{ mt: 3, mb: 2 }} onClick={handleTweetVariablesSequence}>
+          <Button variant="contained" sx={{ mt: 3, mb: 2 }} onClick={handleAddTweetVariables}>
           Add tweet variables</Button>
         </TableCell></TableRow> : null}
         </TableBody>
