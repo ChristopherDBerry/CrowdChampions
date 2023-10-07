@@ -12,9 +12,24 @@ import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 
 
-export default function TweetBody({selectedTweet, setSelectedTweet}) {
+function interpolateTweet(inputString, variables) {
+  let outputString = inputString;
+
+  for (const variableName in variables) {
+    const regex = new RegExp(`{${variableName}}`, 'g');
+    outputString = outputString.replace(regex, variables[variableName]);
+  }
+
+  return outputString;
+}
+
+
+export default function TweetBody(
+  {selectedTweet, setSelectedTweet,
+    tweetPreview, setTweetPreview}) {
 
   const [tweetVariables, setTweetVariables] = React.useState([])
+  const [tweetVariablesRow, setTweetVariablesRow] = React.useState(0)
 
   const handleBodyChange = (event) => {
     setSelectedTweet(prev => {
@@ -43,6 +58,13 @@ export default function TweetBody({selectedTweet, setSelectedTweet}) {
     })
   }
 
+  const handleTweetVariableFocus = (rowIndex) => {
+    setTweetVariablesRow(rowIndex);
+    const preview = interpolateTweet(selectedTweet.body,
+      selectedTweet.body_template_data[rowIndex])
+    setTweetPreview(preview);
+  }
+
   const renderExtractedVariables = () => {
     const variables = extractVariablesFromTemplate(
       selectedTweet.body);
@@ -51,7 +73,6 @@ export default function TweetBody({selectedTweet, setSelectedTweet}) {
 
   React.useEffect(() => {
     renderExtractedVariables()
-    //console.log(selectedTweet.body_template_data)
   }, [selectedTweet.body])
 
   function extractVariablesFromTemplate(fString) {
@@ -93,10 +114,17 @@ export default function TweetBody({selectedTweet, setSelectedTweet}) {
           <TableRow key={rowIndex}>
           {tweetVariables.map((variableName, cellIndex) => (
             <TableCell key={cellIndex}>
-            <TextField id={`${cellIndex}-${rowIndex}-${variableName}`} className="tweet-variable"
+            <TextField id={`${cellIndex}-${rowIndex}-${variableName}`}
+              className = 'tweet-variable'
+              inputProps={
+                rowIndex === tweetVariablesRow ?
+                { style: { fontWeight: 'bold', color: 'green'} } : {}
+              }
               onChange={(event) => handleTweetVariablesText(event, rowIndex, variableName)}
+              onFocus={() => handleTweetVariableFocus(rowIndex)}
               value={row?.[variableName] || ''}
-              size="small" />
+              size="small"
+            />
             </TableCell>
           ))}
           </TableRow>

@@ -21,6 +21,7 @@ import { GET_CLIENTS_URL, GET_CLIENT_TWEETS_URL,
 import { processData } from '../utils/common';
 
 import TweetBody from './TweetBody';
+import TweetPreview from './TweetPreview';
 
 
 export default function Tweets() {
@@ -43,7 +44,9 @@ export default function Tweets() {
   }
   const [selectedTweet, setSelectedTweet] = React.useState(unselectedTweet)
 
-  const [selectedInterval, setSelectedInterval] = React.useState(0)
+  const [tweetPreview, setTweetPreview] = React.useState('')
+
+  //const [selectedInterval, setSelectedInterval] = React.useState(0)
   const [intervals, setIntervals] = React.useState([])
 
   const { apiAuth } = useApiAuthContext()
@@ -142,6 +145,7 @@ export default function Tweets() {
             </Select>
           </FormControl>
         </Grid>
+        <TweetPreview tweetPreview={tweetPreview} />
         <Grid item xs={12}>
           <FormControlLabel
             control={
@@ -163,7 +167,12 @@ export default function Tweets() {
           />
         </Grid>
 
-        <TweetBody selectedTweet={selectedTweet} setSelectedTweet={setSelectedTweet} />
+        <TweetBody
+          selectedTweet={selectedTweet}
+          setSelectedTweet={setSelectedTweet}
+          tweetPreview={tweetPreview}
+          setTweetPreview={setTweetPreview}
+        />
 
         <Grid item xs={12}>
           <InputLabel>Interval</InputLabel>
